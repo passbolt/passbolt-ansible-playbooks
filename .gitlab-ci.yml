@@ -1,0 +1,10 @@
+image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/alpine:latest
+
+variables:
+  ANSIBLE_CONFIG: "${CI_PROJECT_DIR}/ansible.cfg"
+
+stages:
+  - lint
+
+include:
+  - local: "/.gitlab-ci/jobs/lint.yml"
