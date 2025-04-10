@@ -1,4 +1,5 @@
 ---
 - name: "Install Passbolt server."
   hosts: all
-  roles: []
+  roles:
+    - ntp
