@@ -1,0 +1,12 @@
+---
+- name: "Include system update tasks"
+  ansible.builtin.import_tasks: update.yml
+
+- name: "Include dependency installation tasks"
+  ansible.builtin.import_tasks: install_dependencies.yml
+
+- name: "Import Passbolt's public key"
+  ansible.builtin.import_tasks: import_passbolt_key.yml
+
+- name: "Include repository configuration tasks"
+  ansible.builtin.import_tasks: configure_repository.yml

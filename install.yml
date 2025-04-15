@@ -2,4 +2,5 @@
 - name: "Install Passbolt server."
   hosts: all
   roles:
+    - system
     - ntp
