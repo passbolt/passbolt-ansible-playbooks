@@ -4,3 +4,4 @@
   roles:
     - system
     - ntp
+    - database

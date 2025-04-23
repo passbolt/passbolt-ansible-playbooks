@@ -1,0 +1,5 @@
+---
+database_configuration:
+  dbname: passbolt_db
+  username: passbolt_db_user
+  host: null
