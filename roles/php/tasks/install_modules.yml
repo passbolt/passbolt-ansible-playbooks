@@ -1,0 +1,28 @@
+- name: "Install core PHP extensions"
+  ansible.builtin.package:
+    name:
+      - php-xml
+      - php-opcache
+      - "{{ (ansible_os_family == 'RedHat') | ternary('php-mysqlnd', 'php-mysql') }}"
+      - php-mbstring
+      - php-intl
+      - php-gd
+      - php-curl
+    state: present
+
+- name: "Install GnuPG extension"
+  ansible.builtin.package:
+    name: "{{ (ansible_os_family == 'RedHat') | ternary('php-pecl-gnupg', 'php-gnupg') }}"
+    state: present
+
+- name: "Install Redis extension if set as enabled"
+  ansible.builtin.package:
+    name: php-redis
+    state: present
+  when: passbolt_use_redis | default(false) | bool
+
+- name: "Install LDAP extension (PRO only)"
+  ansible.builtin.package:
+    name: php-ldap
+    state: present
+  when: (passbolt_edition | default('pro')) == 'pro'
