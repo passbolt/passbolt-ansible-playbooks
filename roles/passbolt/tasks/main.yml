@@ -1,0 +1,12 @@
+---
+- name: "Install passbolt server package"
+  ansible.builtin.import_tasks: install_server.yml
+
+- name: "Configure server GPG keys for passbolt server"
+  ansible.builtin.import_tasks: configure_serverkeys.yml
+
+- name: "Create passbolt configuration file"
+  ansible.builtin.import_tasks: create_config_file.yml
+
+- name: "Install passbolt and register first administrator"
+  ansible.builtin.import_tasks: install_passbolt.yml

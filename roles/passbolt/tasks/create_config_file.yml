@@ -1,0 +1,8 @@
+---
+- name: "Generate Passbolt configuration"
+  ansible.builtin.template:
+    src: passbolt.php.j2
+    dest: "/etc/passbolt/passbolt.php"
+    owner: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    group: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    mode: '0640'

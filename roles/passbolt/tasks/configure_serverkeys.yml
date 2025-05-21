@@ -1,0 +1,66 @@
+- name: Ensure Passbolt GPG home exists
+  ansible.builtin.file:
+    path: /var/lib/passbolt/.gnupg
+    state: directory
+    owner: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    group: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    mode: '0700'
+
+- name: Create GPG key pairs for server
+  ansible.builtin.command:
+    chdir: /var/lib/passbolt
+    creates: /var/lib/passbolt/.gnupg/private-keys-v1.d
+    cmd: "gpg --batch --no-tty --homedir /var/lib/passbolt/.gnupg --gen-key"
+    stdin: |
+      Key-Type: RSA
+      Key-Length: 3072
+      Subkey-Type: RSA
+      Subkey-Length: 3072
+      Name-Real: "{{ passbolt_configuration.gpg_name }}"
+      Name-Email: "{{ passbolt_configuration.gpg_email }}"
+      Expire-Date: 0
+      %no-protection
+      %commit
+  become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+  become: true
+
+- name: Export public server GPG key
+  ansible.builtin.command:
+    cmd: >
+      gpg
+      --homedir /var/lib/passbolt/.gnupg
+      --no-tty
+      --armor
+      --export "{{ passbolt_configuration.gpg_email }}"
+      --output /etc/passbolt/gpg/serverkey.asc
+    creates: /etc/passbolt/gpg/serverkey.asc
+
+- name: Export private server GPG key
+  ansible.builtin.command:
+    cmd: >
+      gpg
+      --homedir /var/lib/passbolt/.gnupg
+      --no-tty
+      --armor
+      --export-secret-keys "{{ passbolt_configuration.gpg_email }}"
+      --output /etc/passbolt/gpg/serverkey_private.asc
+    creates: /etc/passbolt/gpg/serverkey_private.asc
+
+- name: Read GPG fingerprint of generated key
+  ansible.builtin.command:
+    cmd: >
+      gpg
+      --homedir /var/lib/passbolt/.gnupg
+      --with-colons
+      --fingerprint
+      "{{ passbolt_configuration.gpg_email }}"
+  register: gpg_fingerprint
+  changed_when: false
+
+- name: Set passbolt_gpg_fingerprint fact
+  ansible.builtin.set_fact:
+    passbolt_gpg_fingerprint: >-
+      {{ (gpg_fingerprint.stdout_lines
+          | select('search','^fpr:')
+          | list)[0]
+          .split(':')[9] }}

@@ -1,0 +1,35 @@
+- name: Import subscription key (Passbolt PRO only)
+  ansible.builtin.copy:
+    content: "{{ passbolt_configuration.subscription_key }}"
+    dest: /etc/passbolt/subscription_key.txt
+    owner: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    group: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    mode: '0640'
+  when: passbolt_edition == "pro"
+
+- name: Ensure JWT directory exists with correct permissions
+  ansible.builtin.file:
+    path: /etc/passbolt/jwt
+    state: directory
+    owner: root
+    group: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    mode: '0750'
+
+- name: Run Passbolt installer and create first admin
+  ansible.builtin.command:
+    argv:
+      - /usr/share/php/passbolt/bin/cake
+      - passbolt
+      - install
+      - --admin-first-name={{ passbolt_configuration.admin_firstname }}
+      - --admin-last-name={{ passbolt_configuration.admin_lastname }}
+      - --admin-username={{ passbolt_configuration.admin_email }}
+    chdir: /usr/share/php/passbolt
+    creates: /var/lib/passbolt/.installed.marker
+  environment:
+    GNUPGHOME: /var/lib/passbolt/.gnupg
+  become: true
+  become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+  register: passbolt_install
+  notify:
+    - Display registration URL
