@@ -1,0 +1,76 @@
+server {
+  listen [::]:80;
+  listen 80;
+  server_name {{ nginx_configuration.fqdn }};
+  client_body_buffer_size     100K;
+  client_header_buffer_size   1K;
+  client_max_body_size        5M;
+
+  client_body_timeout   10;
+  client_header_timeout 10;
+  keepalive_timeout     5 5;
+  send_timeout          10;
+
+  root /usr/share/php/passbolt/webroot;
+  index index.php;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    try_files                $uri =404;
+    include                  fastcgi_params;
+    fastcgi_pass             unix:/run/php/{{ (ansible_os_family == 'Debian') | ternary('php8.2-fpm', 'www') }}.sock;
+    fastcgi_index            index.php;
+    fastcgi_intercept_errors on;
+    fastcgi_split_path_info  ^(.+\.php)(.+)$;
+    fastcgi_param            SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param            SERVER_NAME $http_host;
+    fastcgi_param PHP_VALUE  "upload_max_filesize=5M \n post_max_size=5M";
+  }
+}
+
+{% if nginx_https_enabled | bool %}
+
+server {
+  listen [::]:443 ssl http2;
+  listen 443 ssl http2;
+  server_name {{ nginx_configuration.fqdn }};
+  client_body_buffer_size     100K;
+  client_header_buffer_size   1k;
+  client_max_body_size        5M;
+
+  client_body_timeout   10;
+  client_header_timeout 10;
+  keepalive_timeout     5 5;
+  send_timeout          10;
+
+  ssl_certificate     {{ (nginx_configuration.certbot_email is string) | ternary('/etc/letsencrypt/live/{{ nginx_configuration.fqdn }}/fullchain.pem', '/etc/ssl/certs/passbolt_certificate.crt') }};
+  ssl_certificate_key {{ (nginx_configuration.certbot_email is string) | ternary('/etc/letsencrypt/live/{{ nginx_configuration.fqdn }}/privkey.pem', '/etc/ssl/certs/passbolt_private.key') }};
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+  ssl_prefer_server_ciphers off;
+  ssl_session_tickets off;
+
+  root /usr/share/php/passbolt/webroot;
+  index index.php;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    try_files                $uri =404;
+    include                  fastcgi_params;
+    fastcgi_pass             unix:/run/php/{{ (ansible_os_family == 'Debian') | ternary('8.2-fpm', 'www') }}.sock;
+    fastcgi_index            index.php;
+    fastcgi_intercept_errors on;
+    fastcgi_split_path_info  ^(.+\.php)(.+)$;
+    fastcgi_param            SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param            SERVER_NAME $http_host;
+    fastcgi_param PHP_VALUE  "upload_max_filesize=5M \n post_max_size=5M";
+  }
+
+}
+{% endif %}

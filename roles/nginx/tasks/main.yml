@@ -1,0 +1,105 @@
+---
+- name: Install NGINX
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: Enable and start the NGINX service
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: started
+
+- name: Install and configure certbot if needed
+  when: nginx_configuration.certbot_email is string
+  block:
+    - name: Install epel-release on RedHat and derivatives (i.e. for certbot)
+      ansible.builtin.dnf:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install certbot
+      ansible.builtin.package:
+        name:
+          - certbot
+          - python3-certbot-nginx
+        state: present
+
+    - name: Register and accept Let's Encrypt TOS
+      ansible.builtin.command:
+        cmd: certbot -n register --agree-tos --email {{ nginx_configuration.certbot_email }}
+        creates: /etc/letsencrypt/accounts/
+
+    - name: Enable the Certbot timer
+      ansible.builtin.service:
+        name: certbot.timer
+        enabled: true
+
+    - name: Get a certificate from Let's Encrypt
+      ansible.builtin.command:
+        cmd: '/usr/local/bin/certbot -n --nginx certonly -d {{ nginx_configuration.fqdn }}'
+        creates: '/etc/letsencrypt/live/{{ nginx_configuration.fqdn }}'
+
+- name: Copy and configure manually-provided certificates
+  when:
+    - nginx_configuration.certbot_email is not string
+    - nginx_configuration.manual_certificate.fullchain_certificate is string
+    - nginx_configuration.manual_certificate.private_key is string
+  block:
+    - name: Copy fullchain certificate
+      ansible.builtin.copy:
+        content: "{{ nginx_configuration.manual_certificate.fullchain_certificate }}"
+        dest: /etc/ssl/certs/passbolt_certificate.crt
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy private certificate key
+      ansible.builtin.copy:
+        content: "{{ nginx_configuration.manual_certificate.private_key }}"
+        dest: /etc/ssl/certs/passbolt_private.key
+        owner: root
+        group: root
+        mode: '0600'
+
+- name: Copy Passbolt's NGINX configuration
+  ansible.builtin.template:
+    src: passbolt.conf.j2
+    dest: "{{ (ansible_os_family == 'Debian') | ternary('/etc/nginx/sites-available/passbolt.conf', '/etc/nginx/conf.d/passbolt.conf') }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Restart NGINX service
+
+- name: Enable Passbolt's NGINX configuration on Debian and derivatives
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/passbolt.conf
+    dest: /etc/nginx/sites-enabled/passbolt.conf
+    owner: root
+    group: root
+    state: link
+  when: ansible_os_family == 'Debian'
+  notify:
+    - Restart NGINX service
+
+- name: Permanently enable HTTP in firewalld
+  ansible.posix.firewalld:
+    service: http
+    state: enabled
+    permanent: true
+    immediate: true
+    offline: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Permanently enable HTTPS in firewalld
+  ansible.posix.firewalld:
+    service: https
+    state: enabled
+    permanent: true
+    immediate: true
+    offline: true
+  when:
+    - ansible_os_family == 'RedHat'
+    - nginx_https_enabled | bool
