@@ -1,0 +1,7 @@
+---
+nginx_configuration:
+  fqdn: passbolt.local
+
+nginx_https_enabled: "{{ (nginx_configuration.certbot_email is string)
+  or (nginx_configuration.manual_certificate.fullchain_certificate is string
+    and nginx_configuration.manual_certificate.private_key is string) }}"
