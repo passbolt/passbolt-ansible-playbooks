@@ -1,0 +1,11 @@
+---
+- name: "Install passbolt-server package"
+  ansible.builtin.package:
+    name: "passbolt-{{ passbolt_edition }}-server"
+    state: present
+
+- name: "Install SELinux policy on RedHat and derivatives"
+  ansible.builtin.package:
+    name: passbolt-server-selinux
+    state: present
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,28 @@
+<?php
+return [
+    'App' => [
+        'fullBaseUrl' => 'http{{ nginx_https_enabled | ternary('s','') }}://{{ nginx_configuration.fqdn }}',
+    ],
+    'Datasources' => [
+        'default' => [
+            'driver' => 'Cake\\Database\\Driver\\Mysql',
+            'host' => '{{ database_configuration.host | default("127.0.0.1", true) }}',
+            'port' => '3306',
+            'username' => '{{ database_configuration.username }}',
+            'password' => '{{ database_configuration.password }}',
+            'database' => '{{ database_configuration.dbname }}',
+        ],
+    ],
+    'passbolt' => [
+        'gpg' => [
+            'serverKey' => [
+                'fingerprint' => '{{ passbolt_gpg_fingerprint }}',
+                'public'    => CONFIG . DS . 'gpg' . DS . 'serverkey.asc',
+                'private'   => CONFIG . DS . 'gpg' . DS . 'serverkey_private.asc',
+            ],
+        ],
+        'ssl' => [
+            'force' => {{ nginx_https_enabled | ternary('true','false') }},
+        ],
+    ],
+];

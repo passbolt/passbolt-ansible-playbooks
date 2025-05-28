@@ -6,3 +6,5 @@
     - ntp
     - database
     - php
+    - nginx
+    - passbolt

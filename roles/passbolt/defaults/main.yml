@@ -1,0 +1,4 @@
+---
+passbolt_configuration:
+  gpg_name: Passbolt default server key
+  gpg_email: "passbolt@{{ nginx_configuration.fqdn }}"

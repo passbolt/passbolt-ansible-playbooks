@@ -1,0 +1,4 @@
+---
+- name: Display registration URL
+  ansible.builtin.debug:
+    msg: "In order to complete your full admin registration, please navigate to {{ passbolt_install.stdout | regex_search('https?://[^\\s]+') }}"
