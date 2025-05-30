@@ -2,6 +2,7 @@
 - name: "Install common required packages for Passbolt installation"
   ansible.builtin.package:
     name:
+      - sudo
       - ca-certificates
       - curl
       - wget
