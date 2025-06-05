@@ -19,6 +19,10 @@
 |`database_configuration.username`|`passbolt_db_user`|String|❌|The name of the Passbolt database user.|
 |`database_configuration.host`|`null`|String representing an IP or a FQDN|❌|The database host. Anything other than `null` will be treated as an external database (thus disabling database installation and creation)|
 |`database_configuration.password`||String|✅|The password for the Passbolt database user.|
+
+### NGINX configuration
+|Name|Default value|Allowed values|Mandatory?|Description|
+|-|-|-|-|-|
 |`nginx_configuration.fqdn`|`passbolt.local`|String|❌|The Fully-Qualified Domain Name for your Passbolt server, without any `http` or `https` schema.|
 |`nginx_configuration.certbot_email`||String|❌|The e-mail to provide to certbot for certificates renewal and other notifications. *By providing this e-mail, this `ansible` playbook will accept the TOS.|
 |`nginx_configuration.manual_certificate.fullchain_certificate`||String|❌|The fullchain certificate content when using manually generated certificates.|
