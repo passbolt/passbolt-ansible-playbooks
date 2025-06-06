@@ -30,11 +30,11 @@
 
 ### Passbolt configuration
 
-| Variable                                  | Default                       | Type   | Mandatory | Edition | Description                                                                                                                  |
-|-------------------------------------------|-------------------------------|--------|-----------|---------|------------------------------------------------------------------------------------------------------------------------------|
-| `passbolt_configuration.gpg_name`         | `Passbolt default server key` | string | ❌     | ALL     | “Real name” field for the server’s GPG key.                                                                                  |
-| `passbolt_configuration.gpg_email`        | `server@localhost.org`        | string | ❌       | ALL     | “Email” field for the server’s GPG key.                                                                                      |
-| `passbolt_configuration.subscription_key` |                               | string | ✅      | PRO     | Base64-encoded subscription key (only for PRO edition).                                                                      |
-| `passbolt_configuration.admin_email`      |                               | string | ✅       | ALL     | Email address of the initial administrator.                                                                                   |
-| `passbolt_configuration.admin_firstname`  |                               | string | ✅       | ALL     | First name of the initial administrator.                                                                                      |
-| `passbolt_configuration.admin_lastname`   |                               | string | ✅       | ALL     | Last name of the initial administrator.                                                                                       |
+| Variable                                  | Default                           | Type   | Mandatory | Edition | Description                                                                                                                  |
+|-------------------------------------------|-----------------------------------|--------|-----------|---------|------------------------------------------------------------------------------------------------------------------------------|
+| `passbolt_configuration.gpg_name`         | `Passbolt default server key`     | string | ❌     | ALL     | “Real name” field for the server’s GPG key.                                                                                  |
+| `passbolt_configuration.gpg_email`        | `server@nginx_configuration.fqdn` | string | ❌       | ALL     | “Email” field for the server’s GPG key.                                                                                      |
+| `passbolt_configuration.subscription_key` |                                   | string | ✅      | PRO     | Base64-encoded subscription key (only for PRO edition).                                                                      |
+| `passbolt_configuration.admin_email`      |                                   | string | ✅       | ALL     | Email address of the initial administrator.                                                                                   |
+| `passbolt_configuration.admin_firstname`  |                                   | string | ✅       | ALL     | First name of the initial administrator.                                                                                      |
+| `passbolt_configuration.admin_lastname`   |                                   | string | ✅       | ALL     | Last name of the initial administrator.                                                                                       |
