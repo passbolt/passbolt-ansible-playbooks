@@ -16,8 +16,8 @@
       Key-Length: 3072
       Subkey-Type: RSA
       Subkey-Length: 3072
-      Name-Real: "{{ passbolt_configuration.gpg_name }}"
-      Name-Email: "{{ passbolt_configuration.gpg_email }}"
+      Name-Real: {{ passbolt_configuration.gpg_name }}
+      Name-Email: {{ passbolt_configuration.gpg_email }}
       Expire-Date: 0
       %no-protection
       %commit
@@ -28,23 +28,27 @@
   ansible.builtin.command:
     cmd: >
       gpg
+      --output /etc/passbolt/gpg/serverkey.asc
       --homedir /var/lib/passbolt/.gnupg
       --no-tty
       --armor
-      --export "{{ passbolt_configuration.gpg_email }}"
-      --output /etc/passbolt/gpg/serverkey.asc
+      --export {{ passbolt_configuration.gpg_email }}
     creates: /etc/passbolt/gpg/serverkey.asc
+  become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+  become: true
 
 - name: Export private server GPG key
   ansible.builtin.command:
     cmd: >
       gpg
+      --output /etc/passbolt/gpg/serverkey_private.asc
       --homedir /var/lib/passbolt/.gnupg
       --no-tty
       --armor
-      --export-secret-keys "{{ passbolt_configuration.gpg_email }}"
-      --output /etc/passbolt/gpg/serverkey_private.asc
+      --export-secret-keys {{ passbolt_configuration.gpg_email }}
     creates: /etc/passbolt/gpg/serverkey_private.asc
+  become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+  become: true
 
 - name: Read GPG fingerprint of generated key
   ansible.builtin.command:
@@ -53,9 +57,11 @@
       --homedir /var/lib/passbolt/.gnupg
       --with-colons
       --fingerprint
-      "{{ passbolt_configuration.gpg_email }}"
+      {{ passbolt_configuration.gpg_email }}
   register: gpg_fingerprint
   changed_when: false
+  become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+  become: true
 
 - name: Set passbolt_gpg_fingerprint fact
   ansible.builtin.set_fact:
