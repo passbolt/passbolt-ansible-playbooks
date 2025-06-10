@@ -1,0 +1,8 @@
+---
+- name: "Apply www.conf template on RedHat and derivatives"
+  ansible.builtin.template:
+    src: www.conf.j2
+    dest: "/etc/php-fpm.d/www.conf"
+    mode: '0644'
+  when: ansible_os_family == 'RedHat'
+  notify: Restart php-fpm
