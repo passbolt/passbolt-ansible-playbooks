@@ -1,0 +1,5 @@
+---
+- name: Restart php-fpm
+  ansible.builtin.service:
+    name: "{{ (ansible_os_family == 'Debian') | ternary('php8.2-fpm', 'php-fpm') }}"
+    state: restarted
