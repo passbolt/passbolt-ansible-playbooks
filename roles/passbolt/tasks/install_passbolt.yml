@@ -32,4 +32,5 @@
   become_user: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
   register: passbolt_install
   notify:
+    - Create install marker
     - Display registration URL
