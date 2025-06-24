@@ -1,0 +1,17 @@
+---
+- name: "Deploy Passbolt repository for Debian and derivatives"
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/passbolt-repository.gpg] https://download.passbolt.com/{{ passbolt_edition }}/debian buster stable"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: "Deploy Passbolt repository for Red Hat and derivatives"
+  ansible.builtin.yum_repository:
+    name: passbolt
+    description: "Passbolt Repository"
+    baseurl: "https://download.passbolt.com/{{ passbolt_edition }}/rpm/el8/stable"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "https://download.passbolt.com/pub.key"
+    state: present
+  when: ansible_os_family == "RedHat"

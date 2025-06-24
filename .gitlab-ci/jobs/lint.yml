@@ -1,0 +1,6 @@
+ansible-lint:
+  stage: lint
+  before_script:
+    - apk add ansible ansible-lint
+  script:
+    - ansible-lint --show-relpath

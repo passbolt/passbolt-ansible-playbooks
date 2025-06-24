@@ -1,0 +1,30 @@
+- name: "Enable AppStream PHP 8.2 module on RedHat and derivatives"
+  ansible.builtin.dnf:
+    name: "@php:8.2"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: "Install PHP 8.2 and PHP-FPM on RedHat and derivatives"
+  ansible.builtin.package:
+    name:
+      - php
+      - php-cli
+      - php-fpm
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: "Install PHP-FPM and CLI on Debian and derivatives"
+  ansible.builtin.apt:
+    name:
+      - php8.2
+      - php8.2-cli
+      - php8.2-fpm
+    state: present
+    install_recommends: false
+  when: ansible_os_family == 'Debian'
+
+- name: "Ensure PHP-FPM is enabled & running"
+  ansible.builtin.service:
+    name: "{{ (ansible_os_family == 'Debian') | ternary('php8.2-fpm', 'php-fpm') }}"
+    enabled: true
+    state: started

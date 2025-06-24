@@ -1,0 +1,27 @@
+---
+- name: "Update package index"
+  ansible.builtin.package:
+    update_cache: true
+
+- name: "Upgrade all installed packages on Debian and derivatives"
+  ansible.builtin.package:
+    upgrade: true
+  when: ansible_os_family == "Debian"
+
+- name: "Upgrade all installed packages on Red Hat and derivatives"
+  ansible.builtin.dnf:
+    update_only: true
+  when: ansible_os_family == "RedHat"
+
+- name: "Clean up unnecessary dependencies for Debian and derivatives"
+  ansible.builtin.apt:
+    autoremove: true
+    autoclean: true
+  when: ansible_os_family == "Debian"
+  changed_when: false
+
+- name: "Clean cache for Red Hat and derivatives"
+  ansible.builtin.dnf:
+    autoremove: true
+  when: ansible_os_family == "RedHat"
+  changed_when: false

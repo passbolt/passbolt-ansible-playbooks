@@ -1,0 +1,10 @@
+---
+- name: "Install Passbolt server."
+  hosts: all
+  roles:
+    - system
+    - ntp
+    - database
+    - php
+    - nginx
+    - passbolt

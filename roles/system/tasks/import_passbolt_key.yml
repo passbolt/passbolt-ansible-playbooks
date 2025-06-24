@@ -1,0 +1,13 @@
+---
+- name: "Import Passbolt GPG key for Debian and derivatives"
+  ansible.builtin.apt_key:
+    url: "https://download.passbolt.com/pub.key"
+    keyring: "/usr/share/keyrings/passbolt-repository.gpg"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: "Import Passbolt GPG key for Red Hat and derivatives"
+  ansible.builtin.rpm_key:
+    key: "https://download.passbolt.com/pub.key"
+    state: present
+  when: ansible_os_family == "RedHat"

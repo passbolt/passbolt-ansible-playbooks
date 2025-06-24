@@ -1,0 +1,5 @@
+.ansible/
+.fact_cache/
+.vscode/
+.idea/
+inventories/

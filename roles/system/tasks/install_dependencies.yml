@@ -1,0 +1,26 @@
+---
+- name: "Install common required packages for Passbolt installation"
+  ansible.builtin.package:
+    name:
+      - sudo
+      - ca-certificates
+      - curl
+      - wget
+      - openssl
+      - gnupg2
+    state: present
+
+- name: "Install Debian-specific packages for Passbolt installation"
+  ansible.builtin.package:
+    name:
+      - apt-transport-https
+      - software-properties-common
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: "Install Red Hat-specific packages for Passbolt installation"
+  ansible.builtin.package:
+    name:
+      - policycoreutils
+    state: present
+  when: ansible_os_family == "RedHat"

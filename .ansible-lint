@@ -1,0 +1,6 @@
+---
+exclude_paths:
+  - .gitlab-ci.yml
+  - .gitlab-ci
+  - venv
+  - env

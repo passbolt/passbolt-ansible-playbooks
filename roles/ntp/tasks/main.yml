@@ -1,0 +1,8 @@
+---
+- name: Install NTP-based synchronisation software.
+  ansible.builtin.package:
+    name: chrony
+    state: present
+  notify:
+    - Enable chrony service
+    - Start chrony service

@@ -1,0 +1,10 @@
+---
+- name: "Reload package cache on Debian and derivatives"
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: "Reload package cache on Red Hat and derivatives"
+  ansible.builtin.dnf:
+    update_cache: true
+  when: ansible_os_family == "RedHat"

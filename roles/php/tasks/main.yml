@@ -1,0 +1,8 @@
+- name: "Include base PHP installation tasks"
+  ansible.builtin.import_tasks: install_php.yml
+
+- name: "Include PHP module installation tasks"
+  ansible.builtin.import_tasks: install_modules.yml
+
+- name: "Apply www.conf template task"
+  ansible.builtin.import_tasks: apply_configuration.yml

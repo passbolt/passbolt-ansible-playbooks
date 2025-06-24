@@ -1,0 +1,12 @@
+---
+- name: Create install marker
+  ansible.builtin.file:
+    path: /var/lib/passbolt/.installed.marker
+    state: touch
+    owner: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    group: "{{ (ansible_os_family == 'RedHat') | ternary('nginx', 'www-data') }}"
+    mode: '0644'
+
+- name: Display registration URL
+  ansible.builtin.debug:
+    msg: "In order to complete your full admin registration, please navigate to {{ passbolt_install.stdout | regex_search('https?://[^\\s]+') }}"
